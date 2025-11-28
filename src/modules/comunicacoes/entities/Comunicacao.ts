@@ -18,7 +18,9 @@ export interface ComunicacaoProps {
   updatedBy: string
 }
 
-export type CreateComunicacaoProps = Omit<ComunicacaoProps, 'id' | 'createdAt' | 'updatedAt' | 'chave'>
+export type CreateComunicacaoProps = Omit<ComunicacaoProps, 'id' | 'createdAt' | 'updatedAt'> & {
+  chave?: string // Chave opcional, se não fornecida será gerada automaticamente
+}
 
 export type UpdateComunicacaoProps = {
   tipo?: TipoComunicacao | undefined
@@ -35,8 +37,13 @@ export class Comunicacao {
 
   static create(data: CreateComunicacaoProps) {
     const timestamp = new Date()
-    // Gera uma chave única separada por hífen baseada no tipo e timestamp
-    const chave = `${data.tipo}-${Date.now()}-${randomUUID().substring(0, 8)}`
+    
+    // Se a chave não foi fornecida, gera automaticamente
+    let chave = data.chave
+    if (!chave) {
+      // Gera uma chave única separada por hífen baseada no tipo e timestamp
+      chave = `${data.tipo}-${Date.now()}-${randomUUID().substring(0, 8)}`
+    }
     
     return new Comunicacao({
       ...data,
