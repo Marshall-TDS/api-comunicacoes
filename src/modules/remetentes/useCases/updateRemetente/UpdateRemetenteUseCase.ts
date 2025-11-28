@@ -1,5 +1,5 @@
 import { AppError } from '../../../../core/errors/AppError'
-import { hashPassword } from '../../../../core/utils/passwordCipher'
+import { encryptPassword } from '../../../../core/utils/passwordCipher'
 import type { UpdateRemetenteDTO } from '../../dto/UpdateRemetenteDTO'
 import { Remetente } from '../../entities/Remetente'
 import type { IRemetenteRepository } from '../../repositories/IRemetenteRepository'
@@ -24,10 +24,10 @@ export class UpdateRemetenteUseCase {
 
     const remetente = Remetente.restore(existing)
 
-    // Se a senha foi fornecida, criptografa
+    // Se a senha foi fornecida, criptografa (usa criptografia bidirecional para poder descriptografar no SMTP)
     const updateData: UpdateRemetenteDTO = { ...payload }
     if (payload.senha) {
-      updateData.senha = await hashPassword(payload.senha)
+      updateData.senha = encryptPassword(payload.senha)
     }
 
     remetente.update(updateData)

@@ -1,5 +1,5 @@
 import { AppError } from '../../../../core/errors/AppError'
-import { hashPassword } from '../../../../core/utils/passwordCipher'
+import { encryptPassword } from '../../../../core/utils/passwordCipher'
 import type { CreateRemetenteDTO } from '../../dto/CreateRemetenteDTO'
 import { Remetente } from '../../entities/Remetente'
 import type { IRemetenteRepository } from '../../repositories/IRemetenteRepository'
@@ -14,7 +14,8 @@ export class CreateRemetenteUseCase {
       throw new AppError('E-mail já está em uso', 409)
     }
 
-    const senhaCriptografada = await hashPassword(payload.senha)
+    // Usa criptografia bidirecional (não hash) para poder descriptografar e usar no SMTP
+    const senhaCriptografada = encryptPassword(payload.senha)
 
     const remetente = Remetente.create({
       ...payload,

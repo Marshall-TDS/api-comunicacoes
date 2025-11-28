@@ -1,15 +1,18 @@
 import type { NextFunction, Request, Response } from 'express'
 import { AppError } from '../../../core/errors/AppError'
 import { comunicacaoRepository } from '../repositories'
+import { remetenteRepository } from '../../remetentes/repositories'
 import { CreateComunicacaoUseCase } from '../useCases/createComunicacao/CreateComunicacaoUseCase'
 import { DeleteComunicacaoUseCase } from '../useCases/deleteComunicacao/DeleteComunicacaoUseCase'
 import { GetComunicacaoUseCase } from '../useCases/getComunicacao/GetComunicacaoUseCase'
 import { ListComunicacoesUseCase } from '../useCases/listComunicacoes/ListComunicacoesUseCase'
 import { UpdateComunicacaoUseCase } from '../useCases/updateComunicacao/UpdateComunicacaoUseCase'
+import { SendEmailUseCase } from '../useCases/SendEmailUseCase'
 import {
   createComunicacaoSchema,
   updateComunicacaoSchema,
 } from '../validators/comunicacao.schema'
+import { sendEmailSchema } from '../validators/sendEmail.schema'
 
 export class ComunicacaoController {
   constructor(
@@ -18,6 +21,7 @@ export class ComunicacaoController {
     private readonly createComunicacao: CreateComunicacaoUseCase,
     private readonly updateComunicacao: UpdateComunicacaoUseCase,
     private readonly deleteComunicacao: DeleteComunicacaoUseCase,
+    private readonly sendEmail: SendEmailUseCase,
   ) {}
 
   index = async (req: Request, res: Response, next: NextFunction) => {
@@ -92,6 +96,20 @@ export class ComunicacaoController {
       return next(error)
     }
   }
+
+  send = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const parseResult = sendEmailSchema.safeParse(req.body)
+      if (!parseResult.success) {
+        throw new AppError('Falha de validação', 422, parseResult.error.flatten())
+      }
+
+      await this.sendEmail.execute(parseResult.data)
+      return res.status(200).json({ status: 'success', message: 'E-mail enviado com sucesso' })
+    } catch (error) {
+      return next(error)
+    }
+  }
 }
 
 export const comunicacaoController = new ComunicacaoController(
@@ -100,5 +118,6 @@ export const comunicacaoController = new ComunicacaoController(
   new CreateComunicacaoUseCase(comunicacaoRepository),
   new UpdateComunicacaoUseCase(comunicacaoRepository),
   new DeleteComunicacaoUseCase(comunicacaoRepository),
+  new SendEmailUseCase(comunicacaoRepository, remetenteRepository),
 )
 

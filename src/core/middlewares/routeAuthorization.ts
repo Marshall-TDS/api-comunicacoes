@@ -15,6 +15,8 @@ const PUBLIC_ROUTES = [
   '/api/auth/logout',
   '/docs',
   '/api/docs',
+  '/comunicacoes/enviar',
+  '/api/comunicacoes/enviar',
 ]
 
 /**
@@ -22,7 +24,18 @@ const PUBLIC_ROUTES = [
  */
 const isPublicRoute = (path: string): boolean => {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  return PUBLIC_ROUTES.some((publicRoute) => normalizedPath.startsWith(publicRoute))
+  return PUBLIC_ROUTES.some((publicRoute) => {
+    // Comparação exata ou verificação se a rota começa com a rota pública
+    // e o próximo caractere (se existir) é '/' ou fim da string
+    if (normalizedPath === publicRoute) {
+      return true
+    }
+    if (normalizedPath.startsWith(publicRoute)) {
+      const nextChar = normalizedPath[publicRoute.length]
+      return !nextChar || nextChar === '/' || nextChar === '?'
+    }
+    return false
+  })
 }
 
 /**
