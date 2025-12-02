@@ -5,7 +5,7 @@ export interface SendEmailDTO {
   anexos?: Array<{
     filename: string
     content: string // base64
-    contentType?: string
-  }>
+    contentType?: string | undefined
+  }> | undefined
 }
 

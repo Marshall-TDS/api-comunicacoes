@@ -5,6 +5,7 @@ export type TipoEnvio = 'imediato' | 'agendado'
 
 export interface ComunicacaoProps {
   id: string
+  seqId?: number | undefined
   tipo: TipoComunicacao
   descricao: string
   assunto: string
@@ -18,7 +19,7 @@ export interface ComunicacaoProps {
   updatedBy: string
 }
 
-export type CreateComunicacaoProps = Omit<ComunicacaoProps, 'id' | 'createdAt' | 'updatedAt'> & {
+export type CreateComunicacaoProps = Omit<ComunicacaoProps, 'id' | 'createdAt' | 'updatedAt' | 'chave'> & {
   chave?: string // Chave opcional, se não fornecida será gerada automaticamente
 }
 
@@ -33,18 +34,18 @@ export type UpdateComunicacaoProps = {
 }
 
 export class Comunicacao {
-  private constructor(private props: ComunicacaoProps) {}
+  private constructor(private props: ComunicacaoProps) { }
 
   static create(data: CreateComunicacaoProps) {
     const timestamp = new Date()
-    
+
     // Se a chave não foi fornecida, gera automaticamente
     let chave = data.chave
     if (!chave) {
       // Gera uma chave única separada por hífen baseada no tipo e timestamp
       chave = `${data.tipo}-${Date.now()}-${randomUUID().substring(0, 8)}`
     }
-    
+
     return new Comunicacao({
       ...data,
       id: randomUUID(),

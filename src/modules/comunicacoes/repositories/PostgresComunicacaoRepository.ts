@@ -4,6 +4,7 @@ import type { IComunicacaoRepository } from './IComunicacaoRepository'
 
 type ComunicacaoRow = {
   id: string
+  seq_id: string
   tipo: string
   descricao: string
   assunto: string
@@ -19,6 +20,7 @@ type ComunicacaoRow = {
 
 const mapRowToProps = (row: ComunicacaoRow): ComunicacaoProps => ({
   id: row.id,
+  seqId: row.seq_id ? parseInt(row.seq_id, 10) : undefined,
   tipo: row.tipo as ComunicacaoProps['tipo'],
   descricao: row.descricao,
   assunto: row.assunto,
@@ -35,14 +37,14 @@ const mapRowToProps = (row: ComunicacaoRow): ComunicacaoProps => ({
 export class PostgresComunicacaoRepository implements IComunicacaoRepository {
   async findAll(): Promise<ComunicacaoProps[]> {
     const result = await pool.query<ComunicacaoRow>(
-      'SELECT * FROM comunicacoes ORDER BY created_at DESC'
+      'SELECT id, seq_id, tipo, descricao, assunto, html, remetente_id, tipo_envio, chave, created_by, updated_by, created_at, updated_at FROM comunicacoes ORDER BY created_at DESC'
     )
     return result.rows.map(mapRowToProps)
   }
 
   async findById(id: string): Promise<ComunicacaoProps | null> {
     const result = await pool.query<ComunicacaoRow>(
-      'SELECT * FROM comunicacoes WHERE id = $1',
+      'SELECT id, seq_id, tipo, descricao, assunto, html, remetente_id, tipo_envio, chave, created_by, updated_by, created_at, updated_at FROM comunicacoes WHERE id = $1',
       [id]
     )
     const row = result.rows[0]
@@ -51,7 +53,7 @@ export class PostgresComunicacaoRepository implements IComunicacaoRepository {
 
   async findByChave(chave: string): Promise<ComunicacaoProps | null> {
     const result = await pool.query<ComunicacaoRow>(
-      'SELECT * FROM comunicacoes WHERE chave = $1',
+      'SELECT id, seq_id, tipo, descricao, assunto, html, remetente_id, tipo_envio, chave, created_by, updated_by, created_at, updated_at FROM comunicacoes WHERE chave = $1',
       [chave]
     )
     const row = result.rows[0]
@@ -60,7 +62,7 @@ export class PostgresComunicacaoRepository implements IComunicacaoRepository {
 
   async findByRemetenteId(remetenteId: string): Promise<ComunicacaoProps[]> {
     const result = await pool.query<ComunicacaoRow>(
-      'SELECT * FROM comunicacoes WHERE remetente_id = $1 ORDER BY created_at DESC',
+      'SELECT id, seq_id, tipo, descricao, assunto, html, remetente_id, tipo_envio, chave, created_by, updated_by, created_at, updated_at FROM comunicacoes WHERE remetente_id = $1 ORDER BY created_at DESC',
       [remetenteId]
     )
     return result.rows.map(mapRowToProps)

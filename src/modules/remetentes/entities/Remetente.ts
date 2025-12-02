@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto'
 
 export interface RemetenteProps {
   id: string
+  seqId?: number | undefined
   nome: string
   email: string
   senha: string
@@ -27,7 +28,7 @@ export type UpdateRemetenteProps = {
 }
 
 export class Remetente {
-  private constructor(private props: RemetenteProps) {}
+  private constructor(private props: RemetenteProps) { }
 
   static create(data: CreateRemetenteProps) {
     const timestamp = new Date()

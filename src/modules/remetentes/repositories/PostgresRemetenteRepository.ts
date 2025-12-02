@@ -4,6 +4,7 @@ import type { IRemetenteRepository } from './IRemetenteRepository'
 
 type RemetenteRow = {
   id: string
+  seq_id: string
   nome: string
   email: string
   senha: string
@@ -18,6 +19,7 @@ type RemetenteRow = {
 
 const mapRowToProps = (row: RemetenteRow): RemetenteProps => ({
   id: row.id,
+  seqId: row.seq_id ? parseInt(row.seq_id, 10) : undefined,
   nome: row.nome,
   email: row.email,
   senha: row.senha,
@@ -33,14 +35,14 @@ const mapRowToProps = (row: RemetenteRow): RemetenteProps => ({
 export class PostgresRemetenteRepository implements IRemetenteRepository {
   async findAll(): Promise<RemetenteProps[]> {
     const result = await pool.query<RemetenteRow>(
-      'SELECT * FROM remetentes ORDER BY nome ASC'
+      'SELECT id, seq_id, nome, email, senha, smtp_host, smtp_port, smtp_secure, created_by, updated_by, created_at, updated_at FROM remetentes ORDER BY nome ASC'
     )
     return result.rows.map(mapRowToProps)
   }
 
   async findById(id: string): Promise<RemetenteProps | null> {
     const result = await pool.query<RemetenteRow>(
-      'SELECT * FROM remetentes WHERE id = $1',
+      'SELECT id, seq_id, nome, email, senha, smtp_host, smtp_port, smtp_secure, created_by, updated_by, created_at, updated_at FROM remetentes WHERE id = $1',
       [id]
     )
     const row = result.rows[0]
@@ -49,7 +51,7 @@ export class PostgresRemetenteRepository implements IRemetenteRepository {
 
   async findByEmail(email: string): Promise<RemetenteProps | null> {
     const result = await pool.query<RemetenteRow>(
-      'SELECT * FROM remetentes WHERE LOWER(email) = LOWER($1)',
+      'SELECT id, seq_id, nome, email, senha, smtp_host, smtp_port, smtp_secure, created_by, updated_by, created_at, updated_at FROM remetentes WHERE LOWER(email) = LOWER($1)',
       [email]
     )
     const row = result.rows[0]
