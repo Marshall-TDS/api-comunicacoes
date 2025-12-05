@@ -22,8 +22,15 @@ export class CreateComunicacaoUseCase {
     }
 
     const comunicacao = Comunicacao.create({
-      ...payload,
+      tipo: payload.tipo,
+      descricao: payload.descricao,
+      assunto: payload.assunto,
+      html: payload.html,
+      remetenteId: payload.remetenteId,
+      tipoEnvio: payload.tipoEnvio,
+      createdBy: payload.createdBy,
       updatedBy: payload.createdBy,
+      // chave será gerada automaticamente se não for fornecida
     })
 
     const createdComunicacao = await this.comunicacaoRepository.create(comunicacao)

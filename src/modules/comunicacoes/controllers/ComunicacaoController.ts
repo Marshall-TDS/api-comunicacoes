@@ -104,7 +104,28 @@ export class ComunicacaoController {
         throw new AppError('Falha de validação', 422, parseResult.error.flatten())
       }
 
-      await this.sendEmail.execute(parseResult.data)
+      // Construir objeto sem anexos se for undefined (com exactOptionalPropertyTypes)
+      const emailData: { chave: string; destinatario: string; variaveis: string[]; anexos?: Array<{ filename: string; content: string; contentType?: string }> } = {
+        chave: parseResult.data.chave,
+        destinatario: parseResult.data.destinatario,
+        variaveis: parseResult.data.variaveis,
+      }
+      
+      if (parseResult.data.anexos && parseResult.data.anexos.length > 0) {
+        // Mapear anexos para garantir que contentType não seja undefined explicitamente
+        emailData.anexos = parseResult.data.anexos.map(anexo => {
+          const mapped: { filename: string; content: string; contentType?: string } = {
+            filename: anexo.filename,
+            content: anexo.content,
+          }
+          if (anexo.contentType) {
+            mapped.contentType = anexo.contentType
+          }
+          return mapped
+        })
+      }
+
+      await this.sendEmail.execute(emailData)
       return res.status(200).json({ status: 'success', message: 'E-mail enviado com sucesso' })
     } catch (error) {
       return next(error)

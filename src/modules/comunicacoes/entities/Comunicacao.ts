@@ -18,7 +18,7 @@ export interface ComunicacaoProps {
   updatedBy: string
 }
 
-export type CreateComunicacaoProps = Omit<ComunicacaoProps, 'id' | 'createdAt' | 'updatedAt'> & {
+export type CreateComunicacaoProps = Omit<ComunicacaoProps, 'id' | 'createdAt' | 'updatedAt' | 'chave'> & {
   chave?: string // Chave opcional, se não fornecida será gerada automaticamente
 }
 
